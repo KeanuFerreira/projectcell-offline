@@ -1,0 +1,30 @@
+{
+  "itemGroup.projectcell": "ProjectCell",
+  "item.projectcell.emc_storage_cell": "EMC Storage Cell",
+
+  "projectcell.message.bound_to_player": "Bound to player: %s",
+  "projectcell.message.nbtFilter.on": "NBT Filter: On",
+  "projectcell.message.nbtFilter.off": "NBT Filter: Off",
+
+  "projectcell.tooltip.nbtFilter.on": "NBT Filter: On",
+  "projectcell.tooltip.nbtFilter.off": "NBT Filter: Off",
+  "projectcell.tooltip.bound": "§aBound§r",
+  "projectcell.tooltip.unbound": "§cUnbound (Shift-Right Click to bind)§r",
+  "projectcell.tooltip.learned": "✓ Learned",
+  "projectcell.tooltip.not_learned": "✗ Not Learned",
+
+  "projectcell.ae2.emc_storage_description": "ProjectE Transmutation Storage",
+
+  "projectcell.configuration.title": "ProjectCell Configs",
+  "projectcell.configuration.emcDisplay": "EMC Display",
+  "projectcell.configuration.emcDisplay.tooltip": "Displays your current EMC and gained EMC/s in the top-left corner.",
+  "projectcell.configuration.enableLearnedTooltip": "Learned Tooltip",
+  "projectcell.configuration.enableLearnedTooltip.tooltip": "Shows learned (✓) or unlearned (✗) indicator on item tooltips.",
+  "projectcell.configuration.formatEMC": "Format EMC",
+  "projectcell.configuration.formatEMC.tooltip": "Enable EMC value formatting with suffixes (M/B/T...). Hold Shift to show full numbers.",
+  "projectcell.configuration.emcShortNames": "Short Unit Names",
+  "projectcell.configuration.emcShortNames.tooltip": "Use short unit names (M/B/T) instead of long names (Million/Billion/Trillion).",
+
+  "projectcell.configuration.limitItemCount": "Limit Item Count",
+  "projectcell.configuration.limitItemCount.tooltip": "Limit the maximum item count per type in the EMC storage cell to 2147483647."
+}

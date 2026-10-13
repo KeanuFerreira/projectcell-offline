@@ -1,0 +1,81 @@
+// 根项目配置 - 多模块项目
+plugins {
+	id 'architectury-plugin' version '3.4-SNAPSHOT'
+	id 'dev.architectury.loom' version '1.6-SNAPSHOT' apply false
+}
+
+architectury {
+	minecraft = '1.20.1'
+}
+
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'architectury-plugin'
+	
+	group = maven_group
+	version = '1.0.1'
+	
+	repositories {
+		maven { url = 'https://maven.architectury.dev/' }
+		maven { url = 'https://maven.fabricmc.net/' }
+		maven { url = 'https://maven.minecraftforge.net/' }
+		maven { url = 'https://maven.shedaniel.me/' }
+		maven { url = 'https://maven.terraformersmc.com/' }
+        // curseforge与modrinth平台仓库
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'CurseMaven'
+                    url = 'https://cursemaven.com'
+                }
+            }
+            filter {
+                includeGroup 'curse.maven'
+            }
+        }
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'Modrinth'
+                    url = 'https://api.modrinth.com/maven'
+                }
+            }
+            filter {
+                includeGroup 'maven.modrinth'
+            }
+        }
+		mavenCentral()
+	}
+	
+	tasks.withType(JavaCompile).configureEach {
+		options.encoding = 'UTF-8'
+		options.release = 17
+	}
+	
+	java {
+		withSourcesJar()
+	}
+	
+	tasks.withType(JavaExec).configureEach {
+		systemProperty 'minecraft.username', rootProject.properties.getOrDefault('minecraft_username', 'Player')
+	}
+}
+
+subprojects {
+	apply plugin: 'dev.architectury.loom'
+	
+	base {
+		archivesName = rootProject.name
+	}
+	
+	loom {
+		silentMojangMappingsLicense()
+	}
+	
+	dependencies {
+		minecraft "com.mojang:minecraft:1.20.1"
+		mappings loom.officialMojangMappings()
+	}
+	
+
+}

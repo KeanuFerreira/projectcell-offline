@@ -1,0 +1,120 @@
+plugins {
+    id 'com.gradleup.shadow' version '8.3.6'
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+loom {
+    forge {
+        mixinConfig "projectcell.mixins.json"
+    }
+    runs {
+        client {
+            client()
+            name "Forge Client"
+            runDir "run/client"
+            programArgs "--username", "Player1"
+        }
+        server {
+            server()
+            name "Forge Server"
+            runDir "run/server"
+        }
+    }
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+    exclude "architectury_inject_*/**"
+    exclude "*-refmap.json"
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier.set("dev-shadow")
+    exclude 'META-INF/versions/**'
+    mergeServiceFiles()
+    exclude 'module-info.class'
+    destinationDirectory = file("$buildDir/libs")
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+    destinationDirectory = file("$buildDir/libs")
+}
+
+jar {
+    archiveClassifier.set("dev")
+    destinationDirectory = file("$buildDir/libs")
+    manifest {
+        attributes([
+            'Specification-Title'     : rootProject.properties.mod_name,
+            'Specification-Version'   : '1',
+            'Implementation-Title'    : project.name,
+            'Implementation-Version'  : project.version
+        ])
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://cursemaven.com" }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        minecraft_version       : minecraft_version,
+        minecraft_version_range : '[1.20.1,1.21)',
+        forge_version           : project.forge_version,
+        forge_version_range     : '[47,48)',
+        loader_version_range    : '[47,)',
+        mod_id                  : 'projectcell',
+        mod_name                : 'ProjectCell',
+        mod_version             : project.version,
+        mod_authors             : 'gmr',
+        mod_license             : 'MIT',
+        mod_description         : '''An AE2 storage cell addon that bridges ProjectE with Applied Energistics 2.
+EMC Storage Cell exposes the player\'s ProjectE transmutation knowledge and EMC balance as an AE2 storage cell.'''
+    ]
+
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+dependencies {
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
+
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+
+
+    modImplementation("curse.maven:applied-energistics-2-223794:6091401")
+    modImplementation("curse.maven:projecte-226410:4901949")
+}
+
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    destinationDirectory = file("$buildDir/libs")
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}

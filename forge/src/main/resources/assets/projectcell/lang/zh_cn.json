@@ -1,0 +1,26 @@
+{
+  "itemGroup.projectcell": "等价元件",
+  "item.projectcell.emc_storage_cell": "等价存储元件",
+  "projectcell.message.bound_to_player": "绑定玩家: %s",
+  "projectcell.message.nbtFilter.on": "NBT过滤：开",
+  "projectcell.message.nbtFilter.off": "NBT过滤：关",
+  "projectcell.tooltip.nbtFilter.on": "NBT过滤：开",
+  "projectcell.tooltip.nbtFilter.off": "NBT过滤：关",
+  "projectcell.tooltip.bound": "§a已绑定§r",
+  "projectcell.tooltip.unbound": "§c未绑定（按住Shift右键进行绑定）§r",
+  "projectcell.tooltip.learned": "✓ 已学习",
+  "projectcell.tooltip.not_learned": "✗ 未学习",
+  "projectcell.ae2.emc_storage_description": "等价转换存储元件",
+  "projectcell.configuration.title": "ProjectCell 配置",
+  "projectcell.configuration.emcDisplay": "EMC 显示",
+  "projectcell.configuration.emcDisplay.tooltip": "在左上角显示你当前的EMC以及已获得的EMC/s。",
+  "projectcell.configuration.enableLearnedTooltip": "已学习的工具提示",
+  "projectcell.configuration.enableLearnedTooltip.tooltip": "在物品工具提示上显示已学习（✓）或未学习（✗）",
+  "projectcell.configuration.formatEMC": "启用格式化",
+  "projectcell.configuration.formatEMC.tooltip": "启用EMC数值格式化缩写（M/B/T...），按住Shift显示完整数值。",
+  "projectcell.configuration.emcShortNames": "启用缩写",
+  "projectcell.configuration.emcShortNames.tooltip": "使用缩写单位（M/B/T）替代完整名称（Million/Billion/Trillion）。",
+
+  "projectcell.configuration.limitItemCount": "限制物品数量",
+  "projectcell.configuration.limitItemCount.tooltip": "限制元件在AE中物品数量的上限，上限为2147483647。"
+}

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "343",
+    "151"
+  ],
+  "key": {
+    "1": {
+      "item": "projecte:red_matter_block"
+    },
+    "2": {
+      "item": "projecte:philosophers_stone"
+    },
+    "3": {
+      "item": "projecte:dark_matter_block"
+    },
+    "4": {
+      "item": "projecte:transmutation_table"
+    },
+    "5": {
+      "item": "ae2:item_cell_housing"
+    }
+  },
+  "result": {
+    "item": "projectcell:emc_storage_cell"
+  }
+}
