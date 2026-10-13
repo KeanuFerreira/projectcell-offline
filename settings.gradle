@@ -10,3 +10,4 @@ pluginManagement {
 
 rootProject.name = 'projectcell'
 include 'forge'
+include 'testharness'

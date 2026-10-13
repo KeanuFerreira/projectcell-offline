@@ -1,0 +1,16 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "MIT"
+
+[[mods]]
+modId = "pctest"
+version = "1.0.0"
+displayName = "ProjectCell test harness"
+description = "Console commands for testing ProjectCell with offline owners. Test servers only."
+
+[[dependencies.pctest]]
+    modId = "projectcell"
+    mandatory = true
+    versionRange = "*"
+    ordering = "AFTER"
+    side = "BOTH"

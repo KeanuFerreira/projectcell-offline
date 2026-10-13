@@ -1,0 +1,17 @@
+// Test-only mod used by the dedicated-server test run (see TESTING.md). Not part of the release.
+
+base {
+    archivesName = "pctest"
+}
+architectury {
+    forge()
+}
+
+dependencies {
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly project(path: ':forge', configuration: 'namedElements')
+    modCompileOnly files("${rootDir}/libs/appliedenergistics2-forge-15.4.10.jar")
+    modCompileOnly files("${rootDir}/libs/ProjectE-1.20.1-PE1.0.1.jar")
+    modCompileOnly files("${rootDir}/libs/teamprojecte-1.20.1-1.1.5.jar")
+    modCompileOnly files("${rootDir}/libs/projectexpansion-1.20.1-1.1.3.jar")
+}
