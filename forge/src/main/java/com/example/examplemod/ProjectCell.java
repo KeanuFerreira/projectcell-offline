@@ -2,16 +2,19 @@ package com.example.examplemod;
 
 import appeng.api.storage.StorageCells;
 import com.example.examplemod.ae2.CellHandler;
+import com.example.examplemod.ae2.KnowledgeKeyCache;
 import com.example.examplemod.item.EMCStorageCell;
 import com.example.examplemod.util.ProjectEUtil;
 import com.mojang.logging.LogUtils;
 import java.util.UUID;
+import moze_intel.projecte.api.event.EMCRemapEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -43,6 +46,8 @@ public class ProjectCell {
       modEventBus.addListener(this::addCreative);
       ITEMS.register(modEventBus);
       MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
+      MinecraftForge.EVENT_BUS.addListener((EMCRemapEvent event) -> KnowledgeKeyCache.invalidateAll());
+      MinecraftForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> KnowledgeKeyCache.invalidateAll());
    }
 
    public static ResourceLocation rl(String path) {

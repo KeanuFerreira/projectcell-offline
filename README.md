@@ -5,7 +5,7 @@ An **EMC Storage Cell keeps working while the player it is bound to is offline**
 lists its contents, and import/export, autocrafting and other players can still insert and
 extract through it.
 
-**Release jar:** `dist/ProjectCell-1.20.1-1.0.1-offline.1.jar`
+**Release jar:** `dist/ProjectCell-1.20.1-1.0.1-offline.2.jar`
 
 It is a drop-in replacement: same mod ID (`projectcell`), the same item (`projectcell:emc_storage_cell`),
 the same cell NBT (`owner_uuid`, `nbt_filter`) and the same recipe. Existing cells and worlds keep working.
@@ -43,7 +43,7 @@ a stale balance can never overwrite a newer one, and no transaction can be appli
 
 1. **Back up** the server's `world` folder.
 2. Stop the server.
-3. In `mods/`, **delete** `ProjectCell-1.20.1-1.0.1.jar` and add `ProjectCell-1.20.1-1.0.1-offline.1.jar`.
+3. In `mods/`, **delete** `ProjectCell-1.20.1-1.0.1.jar` and add `ProjectCell-1.20.1-1.0.1-offline.2.jar`.
    Never keep both jars.
 4. Start the server. The log should contain:
    `EMC Storage Cells stay available while their owner is offline (Team ProjectE data)`
@@ -91,9 +91,11 @@ Without Team ProjectE the jar loads and behaves exactly like the original 1.0.1.
 - **Duplicate counts across cells of the same owner or team.** Two cells of the same owner (or of teammates sharing
   EMC) in one network each report the full balance, so AE2 shows the amount twice. Extraction still can't overspend
   (tested). This is unchanged from the original mod.
-- **CPU cost.** A cell whose owner is offline now costs what an online owner's cell already did: a pass over the owner's
-  learned items each time AE2 refreshes its item list. Measured: about 3 ms for about 1,500 learned items, and only while
-  something is watching the network, such as an open terminal.
+- **CPU cost.** A cell whose owner is offline now costs what an online owner's cell already did: AE2 lists the
+  owner's learned items each time it refreshes its item list, which happens only while something watches the network,
+  such as an open terminal. Since 1.0.1-offline.2 the per-item work (EMC values, item keys, NBT checks) is cached and
+  rebuilt only when the owner's knowledge or the EMC values change. A listing of 1,533 items takes about 0.8 ms
+  (1.7 ms before).
 - **Crash rollback.** A server crash rolls Team ProjectE data and AE2 or chest contents back to the last world save
   together. This is the same as for every other storage and is unchanged from online use.
 - Tested with simulated players on a real dedicated server (see `TESTING.md`), not with real clients.

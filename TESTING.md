@@ -13,7 +13,7 @@ AE2 15.4.10, GuideME 20.1.15, ProjectE PE1.0.1, Team ProjectE 1.1.5 and Project 
 `testharness/run_tests.py` drives the server through its console, checks every result, and restarts the server twice.
 
 ```bash
-python3 testharness/run_tests.py <server_dir> forge/build/libs/projectcell-1.0.1-offline.1.jar
+python3 testharness/run_tests.py <server_dir> forge/build/libs/projectcell-1.0.1-offline.2.jar
 ```
 
 ## 1. Bug reproduced with the original jar (`--baseline`)
@@ -24,12 +24,14 @@ python3 testharness/run_tests.py <server_dir> forge/build/libs/projectcell-1.0.1
 | This build | 123 diamonds | **123** | **5 accepted** |
 | This build, `offlineOwnerAccess = false` | 123 diamonds | 0 | 0 accepted |
 
-## 2. Full matrix: 40 of 40 checks passed
+## 2. Full matrix: 43 of 43 checks passed (1.0.1-offline.2)
 
 Three server sessions:
 1. **Session A:** online basics, then the owner goes offline while another player stays online, then several cells and players.
 2. **Restart, session B:** everything while the owner is still offline, then a Power Flower login and a respawn.
 3. **Restart, session C:** a Power Flower login with no cell activity.
+
+The "cache:" checks cover the listing cache added in offline.2.
 
 ```
 PASS unknown item not listed
@@ -49,6 +51,7 @@ PASS offline: iron not known yet
 PASS offline: insert accepted
 PASS offline: insert adds sell value
 PASS offline: insert teaches item
+PASS cache: newly learned item listed at once
 PASS offline: extract
 PASS offline: extract costs value
 PASS offline: NBT filter still refuses
@@ -69,11 +72,14 @@ PASS flower backlog + offline cell changes merge exactly once  [PASS flower-merg
 PASS after login: offline-learned item still known
 PASS after login: count matches live EMC
 PASS after respawn: extract works
-PASS full knowledge offline: all items listed  [keys=1533 scan=11246us]
+PASS full knowledge offline: all items listed  [keys=1533 scan=15726us]
+INFO full-knowledge warm scan times (us): [1179, 1254, 1458, 1483, 1753]
+PASS cache: dropping full knowledge shrinks the list at once  [keys=2]
+PASS cache: counts still right after /reload (EMC remap)
 PASS restart 2: balance persisted
 PASS flower merge without cell activity  [PASS flower-merge expected=1918354738085984 actual=1918354738085984 flowerStoredAfter=0]
 
-40 checks, 0 failed
+43 checks, 0 failed
 ```
 
 **Power Flower check.** The test waits until the flower has a backlog with Alice offline. Offline cell inserts and extracts have already happened by then. It logs Alice in 30 ticks before the flower fires, then waits for the delivery. The final EMC must equal the balance at login, plus the flower backlog, plus that one firing. The two numbers matched exactly, and the flower's stored EMC was 0 afterwards.
@@ -84,6 +90,15 @@ The baseline scenario was also run on the server's real `mods` (351 jars), `conf
 - the server started normally and logged the offline-access line;
 - owner online: 123 diamonds; owner offline: 123; offline insert: 5 of 5 accepted;
 - no errors or warnings from ProjectCell. The one exception is Forge adding the new config key to the existing `server.toml`, which is expected.
+
+## 4. Listing performance (`--bench`)
+
+AE2 asks for a cell's full item list every tick while anything watches the network. The benchmark lists a cell whose owner is offline and has full knowledge (1,533 items), and takes the median of 30 warm runs:
+
+| Version | Median | Fastest |
+|---|---|---|
+| 1.0.1-offline.1 | 1,659 µs | 1,314 µs |
+| 1.0.1-offline.2 (cached) | 788 µs | 720 µs |
 
 ## Mapping to the requested matrix
 

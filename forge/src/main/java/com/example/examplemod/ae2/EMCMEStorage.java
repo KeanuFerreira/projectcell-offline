@@ -11,7 +11,6 @@ import appeng.api.storage.cells.StorageCell;
 import com.example.examplemod.Config;
 import com.example.examplemod.util.ProjectEUtil;
 import java.math.BigInteger;
-import java.util.Iterator;
 import java.util.UUID;
 import moze_intel.projecte.api.ItemInfo;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
@@ -183,38 +182,42 @@ public class EMCMEStorage implements StorageCell {
 
    public void getAvailableStacks(KeyCounter out) {
       IKnowledgeProvider provider = ProjectEUtil.getOwnerProvider(this.owner);
-      if (provider != null) {
-         BigInteger playerEmc = provider.getEmc();
-         long lim = limit();
-			Iterator var6 = provider.getKnowledge().iterator();
-
-			while(true) {
-				BigInteger count;
-				AEItemKey key;
-				do {
-					do {
-						ItemInfo info;
-						do {
-							long itemValue;
-							do {
-								if (!var6.hasNext()) {
-									return;
-								}
-
-								info = (ItemInfo)var6.next();
-								itemValue = IEMCProxy.INSTANCE.getValue(info);
-							} while(itemValue <= 0L);
-
-							count = playerEmc.divide(BigInteger.valueOf(itemValue));
-						} while(count.compareTo(BigInteger.ZERO) <= 0);
-
-						key = createKey(info);
-					} while(key == null);
-				} while(this.nbtFilter && isBlocked(key));
-
-               out.add(key, count.min(BigInteger.valueOf(lim)).longValue());
-            }
+      if (provider == null) {
+         return;
       }
+      BigInteger playerEmc = provider.getEmc();
+      if (playerEmc.signum() <= 0) {
+         return;
+      }
+      long lim = limit();
+      // Most balances fit in a long; dividing longs is much cheaper than BigInteger division.
+      boolean fitsLong = playerEmc.bitLength() < 64;
+      long emcLong = fitsLong ? playerEmc.longValue() : 0L;
+      BigInteger bigLim = BigInteger.valueOf(lim);
+      for (KnowledgeKeyCache.Entry entry : KnowledgeKeyCache.get(this.owner, this.nbtFilter, provider, this::listableEntry)) {
+         long count;
+         if (fitsLong) {
+            count = Math.min(emcLong / entry.value(), lim);
+         } else {
+            count = playerEmc.divide(BigInteger.valueOf(entry.value())).min(bigLim).longValue();
+         }
+         if (count > 0L) {
+            out.add(entry.key(), count);
+         }
+      }
+   }
+
+   /** The cached part of a listing: key and value of a learned item, or null if it can't be listed. */
+   private KnowledgeKeyCache.Entry listableEntry(ItemInfo info) {
+      long itemValue = IEMCProxy.INSTANCE.getValue(info);
+      if (itemValue <= 0L) {
+         return null;
+      }
+      AEItemKey key = createKey(info);
+      if (key == null || this.nbtFilter && isBlocked(key)) {
+         return null;
+      }
+      return new KnowledgeKeyCache.Entry(key, itemValue);
    }
 
    public Component getDescription() {

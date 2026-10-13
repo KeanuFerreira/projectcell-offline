@@ -181,6 +181,23 @@ def baseline(server_dir):
     s.stop()
 
 
+def bench(server_dir):
+    """Median AE2 listing time for a cell whose owner (offline) knows 1,085 or all items."""
+    s = Server(server_dir)
+    s.start()
+    build_networks(s)
+    s.pc("login Alice")
+    s.pc("setemc Alice 100000000000")
+    s.pc("putcell %s 0 Alice true" % N1)
+    s.pc("logout Alice")
+    time.sleep(1)
+    for label, full in (("1533 items (full knowledge)", True),):
+        s.pc("fullknowledge Alice %s" % ("true" if full else "false"))
+        times = sorted(count(s, N1, COBBLE)[2] for _ in range(40))[5:35]
+        print("BENCH %s: median %d us, min %d us" % (label, times[len(times) // 2], times[0]))
+    s.stop()
+
+
 def session_a(s):
     build_networks(s)
     v_dia, sell_dia = value(s, DIAMOND)
@@ -219,6 +236,7 @@ def session_a(s):
     check("offline: insert accepted", insert(s, N1, IRON, 10) == 10)
     check("offline: insert adds sell value", emc(s, "Alice") == e2 + 10 * sell_iron)
     check("offline: insert teaches item", knows(s, "Alice", IRON))
+    check("cache: newly learned item listed at once", count(s, N1, IRON)[0] == emc(s, "Alice") // v_iron)
     e3 = emc(s, "Alice")
     check("offline: extract", extract(s, N1, DIAMOND, 4) == 4)
     check("offline: extract costs value", emc(s, "Alice") == e3 - 4 * v_dia)
@@ -294,7 +312,14 @@ def session_b(s, before):
     fresh, _, micros = count(s, N1, COBBLE)
     keys = num(s.pc("count %s %s" % (N1, COBBLE)), "keys")
     check("full knowledge offline: all items listed", fresh > 0 and keys > 100, "keys=%s scan=%sus" % (keys, micros))
+    warm = sorted(count(s, N1, COBBLE)[2] for _ in range(5))
+    print("INFO full-knowledge warm scan times (us): %s" % warm)
     s.pc("fullknowledge Alice false")
+    keys_after = num(s.pc("count %s %s" % (N1, COBBLE)), "keys")
+    check("cache: dropping full knowledge shrinks the list at once", keys_after < 100, "keys=%s" % keys_after)
+    s.raw("reload", 8)
+    e4 = emc(s, "Alice")
+    check("cache: counts still right after /reload (EMC remap)", count(s, N1, IRON)[0] == min(e4 // value(s, IRON)[0], CAP))
     s.pc("flower place %s Alice" % FLOWER)
     return {"alice": emc(s, "Alice")}
 
@@ -321,6 +346,9 @@ def main():
 def run():
     server_dir, jar = sys.argv[1], sys.argv[2]
     prepare(server_dir, jar)
+    if "--bench" in sys.argv:
+        bench(server_dir)
+        return
     if "--baseline" in sys.argv:
         baseline(server_dir)
         return
