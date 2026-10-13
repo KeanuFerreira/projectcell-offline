@@ -26,5 +26,7 @@
   "projectcell.configuration.emcShortNames.tooltip": "Use short unit names (M/B/T) instead of long names (Million/Billion/Trillion).",
 
   "projectcell.configuration.limitItemCount": "Limit Item Count",
-  "projectcell.configuration.limitItemCount.tooltip": "Limit the maximum item count per type in the EMC storage cell to 2147483647."
+  "projectcell.configuration.limitItemCount.tooltip": "Limit the maximum item count per type in the EMC storage cell to 2147483647.",
+  "projectcell.configuration.offlineOwnerAccess": "Offline Owner Access",
+  "projectcell.configuration.offlineOwnerAccess.tooltip": "Keep EMC Storage Cells working while their owner is offline (requires Team ProjectE)."
 }

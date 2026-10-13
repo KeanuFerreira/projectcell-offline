@@ -17,6 +17,7 @@ public class Config {
    public static class Server {
       public final ForgeConfigSpec spec;
       public final ForgeConfigSpec.BooleanValue limitItemCount;
+      public final ForgeConfigSpec.BooleanValue offlineOwnerAccess;
 
       Server() {
          ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -24,6 +25,11 @@ public class Config {
             .comment("Limit the maximum item count per type in the EMC storage cell to 2147483647.")
             .translation("projectcell.configuration.limitItemCount")
             .define("limitItemCount", true);
+         offlineOwnerAccess = builder
+            .comment("Keep EMC Storage Cells working while their owner is offline.",
+               "Requires Team ProjectE, which stores EMC and knowledge in the world save. Without it this has no effect.")
+            .translation("projectcell.configuration.offlineOwnerAccess")
+            .define("offlineOwnerAccess", true);
          spec = builder.build();
       }
    }

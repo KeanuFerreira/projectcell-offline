@@ -22,5 +22,7 @@
   "projectcell.configuration.emcShortNames.tooltip": "使用缩写单位（M/B/T）替代完整名称（Million/Billion/Trillion）。",
 
   "projectcell.configuration.limitItemCount": "限制物品数量",
-  "projectcell.configuration.limitItemCount.tooltip": "限制元件在AE中物品数量的上限，上限为2147483647。"
+  "projectcell.configuration.limitItemCount.tooltip": "限制元件在AE中物品数量的上限，上限为2147483647。",
+  "projectcell.configuration.offlineOwnerAccess": "离线所有者访问",
+  "projectcell.configuration.offlineOwnerAccess.tooltip": "所有者离线时，EMC存储元件仍可使用（需要 Team ProjectE）。"
 }

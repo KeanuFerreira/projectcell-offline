@@ -19,7 +19,6 @@ import moze_intel.projecte.api.proxy.IEMCProxy;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 public class EMCMEStorage implements StorageCell {
@@ -122,21 +121,22 @@ public class EMCMEStorage implements StorageCell {
       if (!IEMCProxy.INSTANCE.hasValue(singleStack)) {
          return 0L;
       }
-      IKnowledgeProvider provider = ProjectEUtil.getKnowledgeProvider(this.owner);
+      IKnowledgeProvider provider = ProjectEUtil.getOwnerProvider(this.owner);
       if (provider == null) {
          return 0L;
       }
+      // Refuse items that would give no EMC; accepting them would void them.
+      long sellValue = IEMCProxy.INSTANCE.getSellValue(singleStack);
+      if (sellValue <= 0L) {
+         return 0L;
+      }
       if (mode == Actionable.MODULATE) {
-         long sellValue = IEMCProxy.INSTANCE.getSellValue(singleStack);
          BigInteger totalValue = BigInteger.valueOf(sellValue).multiply(BigInteger.valueOf(amount));
          provider.setEmc(provider.getEmc().add(totalValue));
-         ServerPlayer player = ProjectEUtil.getPlayer(this.owner);
-         if (player != null) {
-            if (provider.addKnowledge(singleStack)) {
-               provider.syncKnowledgeChange(player, IEMCProxy.INSTANCE.getPersistentInfo(ItemInfo.fromStack(singleStack)), true);
-            }
-            provider.syncEmc(player);
+         if (provider.addKnowledge(singleStack)) {
+            ProjectEUtil.syncKnowledgeChange(this.owner, provider, IEMCProxy.INSTANCE.getPersistentInfo(ItemInfo.fromStack(singleStack)));
          }
+         ProjectEUtil.syncEmc(this.owner, provider);
       }
       return amount;
    }
@@ -157,7 +157,7 @@ public class EMCMEStorage implements StorageCell {
          return 0L;
       }
 
-      IKnowledgeProvider provider = ProjectEUtil.getKnowledgeProvider(this.owner);
+      IKnowledgeProvider provider = ProjectEUtil.getOwnerProvider(this.owner);
       if (provider == null || !provider.hasKnowledge(stack)) {
          return 0L;
       }
@@ -176,16 +176,13 @@ public class EMCMEStorage implements StorageCell {
       if (mode == Actionable.MODULATE) {
          BigInteger totalCost = BigInteger.valueOf(itemValue).multiply(BigInteger.valueOf(extractAmount));
          provider.setEmc(playerEmc.subtract(totalCost));
-         ServerPlayer player = ProjectEUtil.getPlayer(this.owner);
-         if (player != null) {
-            provider.syncEmc(player);
-         }
+         ProjectEUtil.syncEmc(this.owner, provider);
       }
       return extractAmount;
    }
 
    public void getAvailableStacks(KeyCounter out) {
-      IKnowledgeProvider provider = ProjectEUtil.getKnowledgeProvider(this.owner);
+      IKnowledgeProvider provider = ProjectEUtil.getOwnerProvider(this.owner);
       if (provider != null) {
          BigInteger playerEmc = provider.getEmc();
          long lim = limit();

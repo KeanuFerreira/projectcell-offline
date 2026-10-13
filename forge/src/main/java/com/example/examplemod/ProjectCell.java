@@ -3,6 +3,7 @@ package com.example.examplemod;
 import appeng.api.storage.StorageCells;
 import com.example.examplemod.ae2.CellHandler;
 import com.example.examplemod.item.EMCStorageCell;
+import com.example.examplemod.util.ProjectEUtil;
 import com.mojang.logging.LogUtils;
 import java.util.UUID;
 import net.minecraft.resources.ResourceLocation;
@@ -10,7 +11,9 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -39,6 +42,7 @@ public class ProjectCell {
       modEventBus.addListener(this::commonSetup);
       modEventBus.addListener(this::addCreative);
       ITEMS.register(modEventBus);
+      MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
    }
 
    public static ResourceLocation rl(String path) {
@@ -71,6 +75,16 @@ public class ProjectCell {
 
    private void commonSetup(FMLCommonSetupEvent event) {
       event.enqueueWork(() -> StorageCells.addCellHandler(CellHandler.INSTANCE));
+   }
+
+   private void serverStarted(ServerStartedEvent event) {
+      if (ProjectEUtil.offlineAccessAvailable()) {
+         LOGGER.info("EMC Storage Cells stay available while their owner is offline (Team ProjectE data)");
+      } else if (ModList.get().isLoaded("teamprojecte")) {
+         LOGGER.info("EMC Storage Cells need their owner online (offlineOwnerAccess = false)");
+      } else {
+         LOGGER.info("EMC Storage Cells need their owner online (Team ProjectE not installed)");
+      }
    }
 
    private void addCreative(BuildCreativeModeTabContentsEvent event) {
